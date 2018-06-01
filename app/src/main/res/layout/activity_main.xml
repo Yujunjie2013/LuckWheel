@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+        <com.example.yu.luckwheel.view.LuckWheelView
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            app:icons="@array/icons"
+            app:innerDistance="30dp"
+            app:names="@array/names"
+            app:num="8"
+            app:offset="20dp"
+            app:orientation="top"
+            android:id="@+id/luck"
+            app:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@mipmap/node" />
+    </FrameLayout>
+</FrameLayout>

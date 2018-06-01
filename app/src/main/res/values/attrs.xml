@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LuckWheelView">
+        <attr name="num" format="integer" />
+        <attr name="names" format="reference" />
+        <attr name="icons" format="reference" />
+        <attr name="offset" format="dimension" />
+        <attr name="innerDistance" format="dimension" />
+        <attr name="textSize" format="dimension" />
+        <attr name="orientation" format="enum">
+            <enum name="right" value="0" />
+            <enum name="bottom" value="90" />
+            <enum name="left" value="180" />
+            <enum name="top" value="270" />
+        </attr>
+    </declare-styleable>
+</resources>
