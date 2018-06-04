@@ -2,6 +2,7 @@ package com.example.yu.luckwheel;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,10 +23,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Random random = new Random();
-                int i = random.nextInt(7);
-
-                Toast.makeText(MainActivity.this, "当前position:"+i, Toast.LENGTH_SHORT).show();
-//                luckWheelView.startRotate(i);
+                int i = random.nextInt(8);
+                i += 1;
+                Log.d("yujj","当前坐标:"+i);
+//                Toast.makeText(MainActivity.this, "当前position:" + i, Toast.LENGTH_SHORT).show();
+                luckWheelView.startRotate(2);
 
             }
         });

@@ -1,5 +1,7 @@
 package com.example.yu.luckwheel.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
@@ -43,7 +45,10 @@ public class LuckWheelView extends View {
     //指针方向，只能是上下左右4个方向、默认是朝上
     private int orientation;
 
+    //偏移角度
     private int startAngle;
+    private int totalAngle;
+
 
     public void LogYuw(String str) {
         Log.w("yujj", str);
@@ -79,7 +84,8 @@ public class LuckWheelView extends View {
         distance = typedArray.getDimension(R.styleable.LuckWheelView_innerDistance, Utils.dip2px(context, 30));
         voffset = typedArray.getDimension(R.styleable.LuckWheelView_offset, Utils.dip2px(context, 20));
         textSize = typedArray.getDimension(R.styleable.LuckWheelView_textSize, 15);
-        startAngle = orientation = typedArray.getInteger(R.styleable.LuckWheelView_orientation, 270);
+        totalAngle = orientation = typedArray.getInteger(R.styleable.LuckWheelView_orientation, 270);
+
         LogYuw("方向:" + orientation);
         if (num == 1 || num == 0) {
             throw new RuntimeException("num 属性值不能为1或0");
@@ -102,8 +108,8 @@ public class LuckWheelView extends View {
             int mipmapId = context.getResources().getIdentifier(name, "mipmap", context.getPackageName());
             bitmaps.add(BitmapFactory.decodeResource(context.getResources(), mipmapId));
         }
-
         angle = 360 / num;
+        startAngle = orientation % angle;
         typedArray.recycle();
     }
 
@@ -138,15 +144,14 @@ public class LuckWheelView extends View {
 
     //根据传入的块数，画不同的块块
     private void drawPan(Canvas canvas) {
+        int startAngle = this.startAngle;
         //这里要记得与外环的间距
         RectF rectF = new RectF(getPaddingLeft() + distance, getPaddingTop() + distance, getWidth() - distance, getHeight() - distance);
-//        int startAnale = 270 % angle;
-        int startAnale = orientation % angle;
         for (int i = 0; i < num; i++) {
             //交替色
             mPaint.setColor((i % 2 == 0) ? Color.rgb(255, 133, 132) : Color.rgb(254, 104, 105));
-            canvas.drawArc(rectF, startAnale, angle, true, mPaint);
-            startAnale += angle;
+            canvas.drawArc(rectF, startAngle, angle, true, mPaint);
+            startAngle += angle;
         }
     }
 
@@ -180,9 +185,6 @@ public class LuckWheelView extends View {
     private void drawIconAndText(Canvas canvas) {
         RectF oval = new RectF(getPaddingLeft() + distance, getPaddingTop() + distance, getWidth() - distance, getHeight() - distance);
 
-        //开始的角度
-        int startAngle = orientation % angle;
-//        int startAngle = 270 % angle;
         //单个方块角度的一般
         int half = angle / 2;
         //远点x,y坐标
@@ -191,7 +193,7 @@ public class LuckWheelView extends View {
         float paddingLeft = getPaddingLeft() + distance;
         //內圆半径
         float radius = (getWidth() - paddingLeft - distance - getPaddingRight()) / 2;
-
+        int startAngle = this.startAngle;
         int imageWidth = (int) (radius / 4);
 //        startAngle += half;
         for (int i = 0; i < num; i++) {
@@ -217,25 +219,38 @@ public class LuckWheelView extends View {
         }
     }
 
-    public void startRotate(final int position) {
+    public void startRotate(int position) {
         if (position > num) {
             throw new IndexOutOfBoundsException("所选区块不能超过总块数");
         }
+        LogYuw("startRotate:" + startAngle);
+        int targetAngle;
+        if (startAngle < orientation) {
+//            startAngle += orientation;
+            targetAngle = Math.abs(orientation - (position * angle - angle / 2));
+        } else {
+            targetAngle = position * angle;
+        }
         //转的圈数
-        int v = (int) (Math.random() * 6) + 4;
-
-        int totalAngle = 360 * v - (startAngle - (position * angle - angle / 2));
-        LogYuw("角度:" + startAngle + "---:" + totalAngle);
+//        int v = (int) (Math.random() * 3) + 3;
+        int v = 3;
+        totalAngle = targetAngle + 360 * v + startAngle;
+        LogYuw("开始角度:" + startAngle + "----targetAngle:" + targetAngle + "-------total:" + totalAngle + "--position:" + position + "----v" + v);
         ObjectAnimator animator = ObjectAnimator.ofInt(this, "rotation", startAngle, totalAngle);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int rotation = (int) animation.getAnimatedValue("rotation");
-                LogYuE("角度:"+rotation);
-//                postInvalidate();
-                orientation=rotation;
+//                LogYuE("角度:" + rotation);
+                startAngle = rotation;
                 ViewCompat.postInvalidateOnAnimation(LuckWheelView.this);
-//                PropertyValuesHolder[] values = animation.getValues();
+            }
+        });
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                animation.removeAllListeners();
             }
         });
         animator.setDuration(3600);
